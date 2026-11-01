@@ -27,6 +27,10 @@ const PROBLEMS = [
 {"pid": "P14358", "contest": "CSP-J", "year": 2025, "slot": "T2", "name": "座位", "path": "CSP-J/2025/P14358 T2 座位.md", "tags": ["模拟", "排名"], "diff": 2},
 {"pid": "P14359", "contest": "CSP-J", "year": 2025, "slot": "T3", "name": "异或和", "path": "CSP-J/2025/P14359 T3 异或和.md", "tags": ["贪心", "前缀异或", "区间调度"], "diff": 4},
 {"pid": "P14360", "contest": "CSP-J", "year": 2025, "slot": "T4", "name": "多边形", "path": "CSP-J/2025/P14360 T4 多边形.md", "tags": ["计数", "0/1 背包", "补集转化"], "diff": 5},
+{"pid": "P17827", "contest": "CSP-J", "year": 2026, "slot": "T1", "name": "旅游", "path": "CSP-J/2026/P17827 T1 旅游.md", "tags": ["模拟", "字符串"], "diff": 1},
+{"pid": "P17828", "contest": "CSP-J", "year": 2026, "slot": "T2", "name": "回文串", "path": "CSP-J/2026/P17828 T2 回文串.md", "tags": ["双指针", "字符串", "游程编码"], "diff": 3},
+{"pid": "P17829", "contest": "CSP-J", "year": 2026, "slot": "T3", "name": "按位与", "path": "CSP-J/2026/P17829 T3 按位与.md", "tags": ["贪心", "位运算"], "diff": 3},
+{"pid": "P17830", "contest": "CSP-J", "year": 2026, "slot": "T4", "name": "纸牌游戏", "path": "CSP-J/2026/P17830 T4 纸牌游戏.md", "tags": ["树形结构", "子树大小", "递推"], "diff": 5},
 {"pid": "P5657", "contest": "CSP-S", "year": 2019, "slot": "D1T1", "name": "格雷码", "path": "CSP-S/2019/P5657 D1T1 格雷码.md", "tags": ["位运算", "递归", "格雷码"], "diff": 3},
 {"pid": "P5658", "contest": "CSP-S", "year": 2019, "slot": "D1T2", "name": "括号树", "path": "CSP-S/2019/P5658 D1T2 括号树.md", "tags": ["树", "栈", "递推（DP）"], "diff": 5},
 {"pid": "P5659", "contest": "CSP-S", "year": 2019, "slot": "D1T3", "name": "树上的数", "path": "CSP-S/2019/P5659 D1T3 树上的数.md", "tags": ["贪心", "构造", "树", "链表", "并查集"], "diff": 9},
@@ -56,5 +60,9 @@ const PROBLEMS = [
 {"pid": "P14361", "contest": "CSP-S", "year": 2025, "slot": "T1", "name": "社团招新", "path": "CSP-S/2025/P14361 T1 社团招新.md", "tags": ["贪心", "排序"], "diff": 3},
 {"pid": "P14362", "contest": "CSP-S", "year": 2025, "slot": "T2", "name": "道路修复", "path": "CSP-S/2025/P14362 T2 道路修复.md", "tags": ["最小生成树", "Kruskal", "状态枚举"], "diff": 6},
 {"pid": "P14363", "contest": "CSP-S", "year": 2025, "slot": "T3", "name": "谐音替换", "path": "CSP-S/2025/P14363 T3 谐音替换.md", "tags": ["字符串", "Trie", "DFS 序", "扫描线 + 树状数组（二维数点）"], "diff": 8},
-{"pid": "P14364", "contest": "CSP-S", "year": 2025, "slot": "T4", "name": "员工招聘", "path": "CSP-S/2025/P14364 T4 员工招聘.md", "tags": ["计数 DP", "延迟决策（贡献提前/推迟计算）", "组合数学"], "diff": 9}
+{"pid": "P14364", "contest": "CSP-S", "year": 2025, "slot": "T4", "name": "员工招聘", "path": "CSP-S/2025/P14364 T4 员工招聘.md", "tags": ["计数 DP", "延迟决策（贡献提前/推迟计算）", "组合数学"], "diff": 9},
+{"pid": "P17831", "contest": "CSP-S", "year": 2026, "slot": "T1", "name": "能量水晶", "path": "CSP-S/2026/P17831 T1 能量水晶.md", "tags": ["贪心", "排序", "双指针", "前缀和"], "diff": 3},
+{"pid": "P17832", "contest": "CSP-S", "year": 2026, "slot": "T2", "name": "地铁", "path": "CSP-S/2026/P17832 T2 地铁.md", "tags": ["图论建模", "最短路", "Floyd"], "diff": 5},
+{"pid": "P17833", "contest": "CSP-S", "year": 2026, "slot": "T3", "name": "迁徙", "path": "CSP-S/2026/P17833 T3 迁徙.md", "tags": ["最短路计数", "贪心", "双指针", "计数"], "diff": 8},
+{"pid": "P17834", "contest": "CSP-S", "year": 2026, "slot": "T4", "name": "研发基地", "path": "CSP-S/2026/P17834 T4 研发基地.md", "tags": ["二分答案", "树形 DP", "换根", "贡献拆分"], "diff": 9}
 ];
