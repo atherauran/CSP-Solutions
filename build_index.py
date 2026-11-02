@@ -1,4 +1,4 @@
-# 扫描 CSP-J/、CSP-S/ 下的题解与 知识点/ 下的知识点，生成导航页使用的 problems.js 与 knowledge.js
+# 扫描 CSP-J/、CSP-S/ 下的题解与 knowledge/ 下的知识点，生成导航页使用的 problems.js 与 knowledge.js
 import json, os, re
 
 root = os.path.dirname(os.path.abspath(__file__))
@@ -27,22 +27,27 @@ for contest in ['CSP-J', 'CSP-S']:
                 'diff': int(diff.group(1)) if diff else None,
             })
 
+cat_names = {
+    'language-basics': '语言基础', 'basic-algorithms': '基础算法', 'data-structures': '数据结构',
+    'dynamic-programming': '动态规划', 'graph-theory': '图论', 'math': '数学', 'strings': '字符串',
+}
 kb = []
-kb_root = os.path.join(root, '知识点')
+kb_root = os.path.join(root, 'knowledge')
 for cat in sorted(os.listdir(kb_root)):
-    mc = re.match(r'(\d+) (.+)$', cat)
+    mc = re.match(r'(\d+)-(.+)$', cat)
     if not mc:
         continue
     for f in sorted(os.listdir(os.path.join(kb_root, cat))):
-        m = re.match(r'(\d+) (.+)\.md$', f)
+        m = re.match(r'(\d+)-.+\.md$', f)
         if not m:
             continue
         text = open(os.path.join(kb_root, cat, f), encoding='utf-8').read()
         level = re.search(r'\*\*组别\*\*：([JS])', text)
         keys = re.search(r'\*\*关键词\*\*：(.*)', text)
         kb.append({
-            'id': f'{mc.group(1)}-{m.group(1)}', 'cat': mc.group(2), 'name': m.group(2),
-            'path': f'知识点/{cat}/{f}',
+            'id': f'{mc.group(1)}-{m.group(1)}', 'cat': cat_names[mc.group(2)],
+            'name': re.match(r'# (.+)', text).group(1).strip(),
+            'path': f'knowledge/{cat}/{f}',
             'level': level.group(1) if level else None,
             'keys': split_list(keys.group(1)) if keys else [],
         })
