@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CSP 真题题解</title>
+<title>CSP 题解与知识库</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 <link rel="stylesheet" id="hl-light" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
 <link rel="stylesheet" id="hl-dark" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" disabled>
@@ -69,6 +69,10 @@ header p { margin: 4px 0 0; color: var(--muted); }
 .name b { font-weight: 500; }
 .name small { display: block; color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .diff { font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 999px; white-space: nowrap; }
+.lv { font-size: 12px; padding: 1px 8px; border-radius: 999px; white-space: nowrap; }
+.lv-J { color: hsl(140 55% 36%); background: hsl(140 55% 40% / .14); }
+.lv-S { color: hsl(25 75% 45%); background: hsl(25 75% 50% / .14); }
+.meta a.tag:hover { text-decoration: none; border-color: var(--accent); }
 .empty { color: var(--muted); margin-top: 40px; text-align: center; }
 
 .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
@@ -103,21 +107,28 @@ article pre code { display: block; padding: 14px 16px; background: none !importa
 <div class="wrap">
   <div id="app"></div>
   <footer>
-    题解与本站由 William 和 Claude 共同编写 ·
+    题解、知识库与本站由 William 和 Claude 共同编写 ·
     GitHub <a href="https://github.com/atherauran" target="_blank" rel="noopener">atherauran</a> ·
     洛谷 <a href="https://www.luogu.com.cn/user/1752953" target="_blank" rel="noopener">willyblah</a>
   </footer>
 </div>
 
 <script src="problems.js"></script>
+<script src="knowledge.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script>
 const app = document.getElementById('app');
-const state = { contest: 'CSP-J', q: '' };
+const state = { tab: 'CSP-J', q: '' };
 const years = [...new Set(PROBLEMS.map(p => p.year))].sort((a, b) => b - a);
 const byPid = Object.fromEntries(PROBLEMS.map(p => [p.pid, p]));
+const byKid = Object.fromEntries(KNOWLEDGE.map(k => [k.id, k]));
+const cats = [...new Set(KNOWLEDGE.map(k => k.cat))];
+const kbTerm = {};
+KNOWLEDGE.forEach(k => [k.name, ...k.keys].forEach(t => kbTerm[t] ??= k));
+const kbName = Object.fromEntries(KNOWLEDGE.map(k => [k.name, k]));
+const levelName = { J: '入门级', S: '提高级' };
 const luogu = pid => `https://www.luogu.com.cn/problem/${pid}`;
 const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -145,12 +156,15 @@ function diffBadge(d) {
   return `<span class="diff" style="color:hsl(${h} 65% 42%);background:hsl(${h} 65% 45% / .14)">${d}</span>`;
 }
 
-function match(p) {
-  if (p.contest !== state.contest) return false;
+const levelBadge = l => l ? `<span class="lv lv-${l}">${levelName[l]}</span>` : '';
+
+function hit(fields) {
   const q = state.q.trim().toLowerCase();
-  if (!q) return true;
-  return [p.pid, p.name, p.slot, String(p.year), ...p.tags].some(s => s.toLowerCase().includes(q));
+  return !q || fields.some(s => s.toLowerCase().includes(q));
 }
+
+const match = p => p.contest === state.tab && hit([p.pid, p.name, p.slot, String(p.year), ...p.tags]);
+const kbMatch = k => hit([k.name, k.cat, levelName[k.level] || '', ...k.keys]);
 
 function rowHtml(p) {
   return `<a class="row" href="#/${p.pid}">
@@ -160,8 +174,23 @@ function rowHtml(p) {
   </a>`;
 }
 
+function kbRowHtml(k) {
+  return `<a class="row" href="#/k/${k.id}">
+    <span class="slot">${k.id.replace('-', '.')}</span>
+    <span class="name"><b>${esc(k.name)}</b><small>${esc(k.keys.join('、'))}</small></span>
+    ${levelBadge(k.level)}
+  </a>`;
+}
+
 function listHtml() {
   let body = '';
+  if (state.tab === '知识库') {
+    for (const c of cats) {
+      const list = KNOWLEDGE.filter(k => k.cat === c && kbMatch(k));
+      if (list.length) body += `<section class="year"><h2>${esc(c)}</h2><div class="col">${list.map(kbRowHtml).join('')}</div></section>`;
+    }
+    return body || '<p class="empty">没有匹配的知识点</p>';
+  }
   for (const y of years) {
     const list = PROBLEMS.filter(p => p.year === y && match(p));
     if (list.length) body += `<section class="year"><h2>${y}</h2><div class="col">${list.map(rowHtml).join('')}</div></section>`;
@@ -169,18 +198,25 @@ function listHtml() {
   return body || '<p class="empty">没有匹配的题目</p>';
 }
 
+const subtitle = () => state.tab === '知识库'
+  ? `${cats.length} 个分类 · ${KNOWLEDGE.length} 个知识点`
+  : `${years[years.length - 1]}–${years[0]} · ${PROBLEMS.length} 题 · 右侧数字为难度（1–10）`;
+const placeholder = () => state.tab === '知识库' ? '搜索知识点、分类或关键词' : '搜索题号、题名或算法标签';
+
 function renderHome() {
-  document.title = 'CSP 真题题解';
-  const seg = ['CSP-J', 'CSP-S'].map(v => `<button data-v="${v}" class="${state.contest === v ? 'on' : ''}">${v}</button>`).join('');
+  document.title = 'CSP 题解与知识库';
+  const seg = ['CSP-J', 'CSP-S', '知识库'].map(v => `<button data-v="${v}" class="${state.tab === v ? 'on' : ''}">${v}</button>`).join('');
   app.innerHTML = `
-    <header class="head"><div><h1>CSP-J/S 历年真题题解</h1><p>${years[years.length - 1]}–${years[0]} · ${PROBLEMS.length} 题 · 右侧数字为难度（1–10）</p></div>${themeBtn()}</header>
+    <header class="head"><div><h1>CSP-J/S 题解与知识库</h1><p id="sub">${subtitle()}</p></div>${themeBtn()}</header>
     <div class="bar"><div class="seg">${seg}</div>
-      <input class="search" placeholder="搜索题号、题名或算法标签" value="${esc(state.q)}"></div>
+      <input class="search" placeholder="${placeholder()}" value="${esc(state.q)}"></div>
     <div id="list">${listHtml()}</div>`;
   const list = app.querySelector('#list'), buttons = app.querySelectorAll('.seg button');
   buttons.forEach(b => b.onclick = () => {
-    state.contest = b.dataset.v;
+    state.tab = b.dataset.v;
     buttons.forEach(x => x.classList.toggle('on', x === b));
+    app.querySelector('#sub').textContent = subtitle();
+    app.querySelector('.search').placeholder = placeholder();
     list.innerHTML = listHtml();
   });
   app.querySelector('.search').oninput = e => { state.q = e.target.value; list.innerHTML = listHtml(); };
@@ -200,26 +236,18 @@ function renderMarkdown(src) {
     katex.renderToString(math[i][0], { displayMode: math[i][1], throwOnError: false }));
 }
 
-async function renderSolution(p) {
-  document.title = `${p.pid} ${p.name} - CSP 真题题解`;
-  state.contest = p.contest;
-  const list = PROBLEMS.filter(x => x.contest === p.contest);
-  const idx = list.indexOf(p), prev = list[idx - 1], next = list[idx + 1];
-  app.innerHTML = `
-    <div class="top"><a href="#/">← ${p.contest} 题目列表</a><span class="crumb">${p.contest} ${p.year} · ${p.slot} ${themeBtn()}</span></div>
-    <h1 style="margin:0;font-size:26px">${esc(p.name)}</h1>
-    <div class="meta"><span>${p.pid}</span>${diffBadge(p.diff)}${p.tags.map(t => `<span class="tag">${esc(t)}</span>`).join('')}
-      <a href="${luogu(p.pid)}" target="_blank" rel="noopener">洛谷原题 ↗</a></div>
-    <article><p class="empty">加载中…</p></article>
-    <div class="nav">${prev ? `<a href="#/${prev.pid}">← ${prev.year} ${prev.slot} ${esc(prev.name)}</a>` : '<span></span>'}
-      ${next ? `<a href="#/${next.pid}">${next.year} ${next.slot} ${esc(next.name)} →</a>` : ''}</div>`;
-  window.scrollTo(0, 0);
+function tagHtml(t) {
+  const k = kbTerm[t];
+  return k ? `<a class="tag" href="#/k/${k.id}">${esc(t)}</a>` : `<span class="tag">${esc(t)}</span>`;
+}
+
+async function loadArticle(path, what, strip) {
   const article = app.querySelector('article');
   try {
-    const res = await fetch(p.path.split('/').map(encodeURIComponent).join('/'));
+    const res = await fetch(path.split('/').map(encodeURIComponent).join('/'));
     if (!res.ok) throw new Error(res.status);
-    const md = (await res.text()).replace(/^# .*\n/, '');
-    article.innerHTML = renderMarkdown(md);
+    article.innerHTML = renderMarkdown(strip(await res.text()))
+      .replace(/《([^《》<]+)》/g, (m, t) => kbName[t] ? `<a href="#/k/${kbName[t].id}">${m}</a>` : m);
     article.querySelectorAll('pre code').forEach(code => {
       hljs.highlightElement(code);
       const btn = document.createElement('button');
@@ -232,13 +260,46 @@ async function renderSolution(p) {
       code.parentElement.appendChild(btn);
     });
   } catch (e) {
-    article.innerHTML = `<p class="empty">题解加载失败。若是直接双击打开的本地文件，请在本目录运行 <code>python3 -m http.server</code> 后访问。<br><a href="${esc(p.path)}">直接查看 Markdown</a></p>`;
+    article.innerHTML = `<p class="empty">${what}加载失败。若是直接双击打开的本地文件，请在本目录运行 <code>python3 -m http.server</code> 后访问。<br><a href="${esc(path)}">直接查看 Markdown</a></p>`;
   }
 }
 
+function renderSolution(p) {
+  document.title = `${p.pid} ${p.name} - CSP 真题题解`;
+  state.tab = p.contest;
+  const list = PROBLEMS.filter(x => x.contest === p.contest);
+  const idx = list.indexOf(p), prev = list[idx - 1], next = list[idx + 1];
+  app.innerHTML = `
+    <div class="top"><a href="#/">← ${p.contest} 题目列表</a><span class="crumb">${p.contest} ${p.year} · ${p.slot} ${themeBtn()}</span></div>
+    <h1 style="margin:0;font-size:26px">${esc(p.name)}</h1>
+    <div class="meta"><span>${p.pid}</span>${diffBadge(p.diff)}${p.tags.map(tagHtml).join('')}
+      <a href="${luogu(p.pid)}" target="_blank" rel="noopener">洛谷原题 ↗</a></div>
+    <article><p class="empty">加载中…</p></article>
+    <div class="nav">${prev ? `<a href="#/${prev.pid}">← ${prev.year} ${prev.slot} ${esc(prev.name)}</a>` : '<span></span>'}
+      ${next ? `<a href="#/${next.pid}">${next.year} ${next.slot} ${esc(next.name)} →</a>` : ''}</div>`;
+  window.scrollTo(0, 0);
+  loadArticle(p.path, '题解', md => md.replace(/^# .*\n/, ''));
+}
+
+function renderKnowledge(k) {
+  document.title = `${k.name} - CSP 知识库`;
+  state.tab = '知识库';
+  const idx = KNOWLEDGE.indexOf(k), prev = KNOWLEDGE[idx - 1], next = KNOWLEDGE[idx + 1];
+  app.innerHTML = `
+    <div class="top"><a href="#/">← 知识库</a><span class="crumb">${esc(k.cat)} · ${k.id.replace('-', '.')} ${themeBtn()}</span></div>
+    <h1 style="margin:0;font-size:26px">${esc(k.name)}</h1>
+    <div class="meta">${levelBadge(k.level)}${k.keys.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>
+    <article><p class="empty">加载中…</p></article>
+    <div class="nav">${prev ? `<a href="#/k/${prev.id}">← ${esc(prev.name)}</a>` : '<span></span>'}
+      ${next ? `<a href="#/k/${next.id}">${esc(next.name)} →</a>` : ''}</div>`;
+  window.scrollTo(0, 0);
+  loadArticle(k.path, '知识点', md => md.replace(/^# .*\n/, '').replace(/^\*\*组别\*\*.*\n/m, ''));
+}
+
 function route() {
-  const p = byPid[location.hash.replace(/^#\/?/, '')];
-  p ? renderSolution(p) : renderHome();
+  const h = location.hash.replace(/^#\/?/, '');
+  const k = h.startsWith('k/') && byKid[h.slice(2)], p = byPid[h];
+  k ? renderKnowledge(k) : p ? renderSolution(p) : renderHome();
 }
 window.addEventListener('hashchange', route);
 syncTheme();
